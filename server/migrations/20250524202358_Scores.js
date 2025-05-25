@@ -4,8 +4,8 @@
  */
 exports.up = function(knex) {
   return knex.schema.createTable('scores', table => {
-    table.increments('scores_id').primary
-    table.integer('user_id')
+    table.increments('scores_id').primary().unique()
+    table.integer('user_id').unique()
     table.foreign('user_id').references('userId').inTable('accounts')
     table.integer('distance')
   })

@@ -4,7 +4,7 @@
  */
 exports.up = function(knex) {
   return knex.schema.createTable('crayons', table => {
-    table.increments('crayonsID').primary
+    table.increments('crayonsID').primary().unique()
     table.string('color')
   })
 };
