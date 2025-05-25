@@ -1,21 +1,22 @@
-export class InvalidBody extends Error{
-    constructor(message) {
+class InvalidBody extends Error{
+    constructor(message = 'Error') {
         super(message);
         this.name = 'InvalidBody';
     }
 }
 
-export class InvalidCredentials extends Error{
-    constructor(message) {
+class InvalidCredentials extends Error{
+    constructor(message = 'Error') {
         super(message);
         this.name = 'InvalidCredentials';
     }
 }
 
-export class UsernameExists extends Error{
-    constructor(message) {
+class UserAlreadyExists extends Error{
+    constructor(message = 'Error') {
         super(message);
-        this.name = UsernameExists;
+        this.name = 'UserAlreadyExists';
     }
 }
 
+module.exports = {InvalidBody, InvalidCredentials, UserAlreadyExists}
