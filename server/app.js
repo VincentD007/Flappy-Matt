@@ -33,30 +33,30 @@ app.post('/Accounts', async (req, res) => {
             throw new InvalidBody();
         }
 
-        let rows;
         await knex('accounts')
         .insert({username: username, password: password})
         .returning('*')
         .onConflict('username').ignore()
-        .then(result => {
-            rows = result;
-            console.log(result)
+        .then(rows => {
+            if (rows.length == 0) {
+                throw new UserAlreadyExists();
+            }
         })
 
-        if (rows.length == 0) {
-            console.log(rows.length)
-            throw new UserAlreadyExists();
-        }
 
-        
-        res.status(200).send(rows);
+        res.status(200).send(`Account created for ${username}`);
     }
     catch(Err) {
         switch (true) {
-            case Err.name = 'InvalidBody':
+            case Err.name == 'InvalidBody':
                 res.status(404).send('Bad Request')
-            case Err.name = 'UserAlreadyExists':
+                break;
+            case Err.name == 'UserAlreadyExists':
                 res.status(409).send(`${username} already exists`)
+                break;
+            default:
+                console.log(Err)
+               res.status(500).send('Internal Server Error') 
         }
     }
 })
