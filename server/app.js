@@ -6,24 +6,76 @@ const { InvalidBody, InvalidCredentials, UserAlreadyExists } = require('./errors
 const cookieParser = require('cookie-parser');
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
+var sessions = {};
+app.use(express.json(), cookieParser());
 
-app.use(express.json(), cookieParser())
 
-app.get('/Login', (req, res) => {
-    let {username, passord} = req.body;
+app.post('/login', async (req, res) => {
+    let {username, password} = req.body;
     try {
-        if (!username || !passord) {
-            throw new InvalidBody()
+        if (!username || !password) {
+            throw new InvalidBody();
+        }
+        const user = await knex('accounts').where({ username }).first();
+        if(!user) throw new InvalidCredentials();
+
+        const validPassword = await bcrypt.compare(password, user.password);
+        if (!validPassword) throw new InvalidCredentials();
+
+        if (req.cookies['SessionID'] && sessions[req.cookies['SessionID']]) {
+            let reqSessionID = req.cookies['SessionID'];
+            if (sessions[reqSessionID].username == username) {
+                return res.status(200).send({ message: `Welcome, ${user.username}!` });
+            }
+            else {
+                delete sessions[reqSessionID];
+            };
+        };
+
+        let sessionId = uuidv4();
+        while (sessions[sessionId]) {
+            sessionId = uuidv4();
         }
 
+        for (let key of Object.keys(sessions)) {
+            if (sessions[key].username == username) {
+                delete sessions[key];
+            };
+        };
+
+        sessions[sessionId] = {
+            userId: user.userId,
+            username: user.username,
+            created: Date.now()
+        };
+
+        res.cookie('SessionID', sessionId, {
+            httpOnly: true,
+            https: true,
+            sameSite: 'strict'
+        });
+        res.status(200).send({ message: `Welcome, ${user.username}!` });
+    } 
+    catch (Err) {
+        switch (true) {
+            case Err.name === 'InvalidBody':
+                return res.status(422).send('Invalid username or password');
+            case Err.name === 'InvalidCredentials':
+                return res.status(401).send('Incorrect username or password');
+            default:
+                console.error(Err);
+                return res.status(500).send('Internal Server Error');
+        }
     }
-    catch(Err) {
-        return res.status(422).send('Bad Request');
-    }
-})
+});
 
 
-app.post('/Accounts', async (req, res) => {
+app.post('/logout', (req, res) => {
+
+});
+
+
+app.post('/accounts', async (req, res) => {
     let {username, password} = req.body;
     try {
         if (!username || !password) {
@@ -33,23 +85,38 @@ app.post('/Accounts', async (req, res) => {
             throw new InvalidBody();
         }
 
-        await knex('accounts')
-        .insert({username: username, password: password})
+        let hashedPassword = await bcrypt.hash(password, 12);
+        let rows = await knex('accounts')
+        .insert({username: username, password: hashedPassword})
         .returning('*')
-        .onConflict('username').ignore()
-        .then(rows => {
-            if (rows.length == 0) {
-                throw new UserAlreadyExists();
-            }
-        })
+        .onConflict('username').ignore();
 
+        if (rows.length == 0) {
+            throw new UserAlreadyExists();
+        };
+
+        let userID = rows[0].userId;
+
+        let insertedScore = await knex('scores')
+        .insert({user_id: userID, distance: 0})
+        .returning('*');
+        
+        let scoresID = insertedScore[0].scores_id
+        await knex('scores_crayons')
+        .insert([
+            {score_id: scoresID, crayon_id: 1, amount: 0},
+            {score_id: scoresID, crayon_id: 2, amount: 0}, 
+            {score_id: scoresID, crayon_id: 3, amount: 0},
+            {score_id: scoresID, crayon_id: 4, amount: 0}
+        ])
 
         res.status(200).send(`Account created for ${username}`);
+
     }
     catch(Err) {
         switch (true) {
             case Err.name == 'InvalidBody':
-                res.status(404).send('Bad Request')
+                res.status(422).send('Bad Request')
                 break;
             case Err.name == 'UserAlreadyExists':
                 res.status(409).send(`${username} already exists`)
