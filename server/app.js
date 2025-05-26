@@ -22,13 +22,10 @@ app.post('/login', async (req, res) => {
         const validPassword = await bcrypt.compare(password, user.password);
         if (!validPassword) throw new InvalidCredentials();
 
-        if (req.cookies['SessionID'] && sessions[req.cookies['SessionID']]) {
-            let reqSessionID = req.cookies['SessionID'];
-            if (sessions[reqSessionID].username == username) {
-                return res.status(200).send({ message: `Welcome, ${user.username}!` });
-            }
-            else {
-                delete sessions[reqSessionID];
+        if (req.cookies['SessionID']) {delete sessions[req.cookies['SessionID']]}; //Removes any previous session established by the requesting client
+        for (let key of Object.keys(sessions)) { //Removes any previous sessions established by the account on different clients
+            if (sessions[key].username == username) {
+                delete sessions[key];
             };
         };
 
@@ -36,12 +33,6 @@ app.post('/login', async (req, res) => {
         while (sessions[sessionId]) {
             sessionId = uuidv4();
         }
-
-        for (let key of Object.keys(sessions)) {
-            if (sessions[key].username == username) {
-                delete sessions[key];
-            };
-        };
 
         sessions[sessionId] = {
             userId: user.userId,
@@ -55,7 +46,7 @@ app.post('/login', async (req, res) => {
             sameSite: 'strict'
         });
         res.status(200).send({ message: `Welcome, ${user.username}!` });
-    } 
+    }
     catch (Err) {
         switch (true) {
             case Err.name === 'InvalidBody':
@@ -123,7 +114,7 @@ app.post('/accounts', async (req, res) => {
                 break;
             default:
                 console.log(Err)
-               res.status(500).send('Internal Server Error') 
+                res.status(500).send('Internal Server Error') 
         }
     }
 })
