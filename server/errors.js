@@ -19,4 +19,11 @@ class UserAlreadyExists extends Error{
     }
 }
 
-module.exports = {InvalidBody, InvalidCredentials, UserAlreadyExists}
+class InvalidSession extends Error{
+    constructor(message = 'Error') {
+        super(message);
+        this.name = 'InvalidSession';
+    }
+}
+
+module.exports = {InvalidBody, InvalidCredentials, UserAlreadyExists, InvalidSession}

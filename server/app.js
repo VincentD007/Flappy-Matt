@@ -2,12 +2,12 @@ const express = require('express');
 const app = express();
 const port = 8080;
 const knex = require('./knex.js');
-const { InvalidBody, InvalidCredentials, UserAlreadyExists } = require('./errors');
+const { InvalidBody, InvalidCredentials, UserAlreadyExists, InvalidSession } = require('./errors');
 const cookieParser = require('cookie-parser');
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
-var sessions = {};
 app.use(express.json(), cookieParser());
+var sessions = {};
 
 
 app.post('/login', async (req, res) => {
@@ -50,19 +50,51 @@ app.post('/login', async (req, res) => {
     catch (Err) {
         switch (true) {
             case Err.name === 'InvalidBody':
-                return res.status(422).send('Invalid username or password');
+                res.status(422).send('Invalid username or password')
+                break;
             case Err.name === 'InvalidCredentials':
-                return res.status(401).send('Incorrect username or password');
+                res.status(401).send('Incorrect username or password')
+                break;
             default:
                 console.error(Err);
-                return res.status(500).send('Internal Server Error');
+                res.status(500).send('Internal Server Error')
         }
     }
 });
 
 
 app.post('/logout', (req, res) => {
+    const { username } = req.body;
+    const clientSession = req.cookies['SessionID'];
+    try {
+        if (!username) {
+            throw new InvalidBody()
+        };
 
+        if (!clientSession) {
+            throw new InvalidSession()
+        };
+
+        if (!sessions[clientSession].username == username) {
+            throw new InvalidSession()
+        };
+
+        delete sessions[clientSession];
+        res.status(200).send(`Session Ended`);
+    }
+    catch(Err) {
+        switch (true) {
+            case Err.name == 'InvalidBody':
+                res.status(422).send('Bad Request')
+                break;
+            case Err.name == 'InvalidSession':
+                res.status(401).send('Invalid Session')
+                break;
+            default:
+                console.error(Err);
+                res.status(500).send('Internal Server Error')
+        };
+    };
 });
 
 
@@ -102,7 +134,6 @@ app.post('/accounts', async (req, res) => {
         ])
 
         res.status(200).send(`Account created for ${username}`);
-
     }
     catch(Err) {
         switch (true) {
