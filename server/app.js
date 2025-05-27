@@ -150,4 +150,15 @@ app.post('/accounts', async (req, res) => {
     }
 })
 
+
+app.put('/accounts', (req, res) => {
+    
+})
+
+
+app.get('/accounts/:username', (req, res) => {
+
+})
+
+
 app.listen(port, '0.0.0.0', () => {console.log(`Listening on port ${port}`)})
