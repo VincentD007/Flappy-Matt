@@ -1,23 +1,25 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const port = 8080;
 const knex = require('./knex.js');
-const { InvalidBody, InvalidCredentials, UserAlreadyExists, InvalidSession } = require('./errors');
+const { InvalidBody, InvalidCredentials, UserAlreadyExists, InvalidSession, NotFound } = require('./errors');
 const cookieParser = require('cookie-parser');
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
-app.use(express.json(), cookieParser());
+app.use(express.json(), cookieParser(), cors());
 var sessions = {};
 
 
 app.post('/login', async (req, res) => {
     let {username, password} = req.body;
+    console.log('INNN')
     try {
         if (!username || !password) {
             throw new InvalidBody();
         }
         const user = await knex('accounts').where({ username }).first();
-        if(!user) throw new InvalidCredentials();
+        if(!user) throw new NotFound();
 
         const validPassword = await bcrypt.compare(password, user.password);
         if (!validPassword) throw new InvalidCredentials();
@@ -42,7 +44,6 @@ app.post('/login', async (req, res) => {
 
         res.cookie('SessionID', sessionId, {
             httpOnly: true,
-            https: true,
             sameSite: 'strict'
         });
         res.status(200).send({ message: `Welcome, ${user.username}!` });
@@ -55,6 +56,8 @@ app.post('/login', async (req, res) => {
             case Err.name === 'InvalidCredentials':
                 res.status(401).send('Incorrect username or password')
                 break;
+            case Err.name === 'NotFound':
+                res.status(404).send('Not Found')
             default:
                 console.error(Err);
                 res.status(500).send('Internal Server Error')
