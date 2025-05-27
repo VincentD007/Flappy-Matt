@@ -1,13 +1,12 @@
 import { useState } from 'react'
-import '../styles/App.css'
-import {phaser} from 'phaser'
+import {Routes, Route} from 'react-router-dom'
 
 function App() {
 
   return (
-    <>
-      Hello
-    </>
+    <Routes>
+      
+    </Routes>
   )
 }
 
