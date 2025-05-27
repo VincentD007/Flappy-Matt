@@ -220,5 +220,73 @@ app.get('/stats/:username', async (req, res) => {
         }
     }
 });
+    app.delete('/accounts', async (req, res) => {
+        const sessionId = req.cookies['SessionId'];
+        try {
+            if (!sessionId || !sessions[sessionId]) throw new InvalidSession();
+            const {userId} = sessions[sessionId];
+            await knex('scores_crayons').whereIn('score_id',
+                knex('scores').select('scores_id').where({user_id: userId})
+            ).del();
+           await knex('scores').where({user_id: userId}).del();
+           await knex('accounts').where({userId}).del();
+           delete sessions[sessionId];
+           res.status(200).send("Account deleted."); 
+        } catch (Err){
+            console.error(Err)
+            res.status(500).send("Failed to delete account.");
+        }
+    });
 
+    app.put('/stats', async (req, res) => {
+        const sessionId = req.cookies['SessionId'];
+        const {distance, crayons} = req.body;
+
+        try{
+            if (!sessionId || !sessions[sessionId]) throw new InvalidSession();
+            const user = sessions[sessionId];
+            const score = await knex('scores').where({user_id: user.userId}).first();
+            if (!score) throw new NotFound();
+            if (typeof distance === 'number') {
+                await knex('scores')
+                    .where({user_id: user.userId})
+                    .update({distance})
+            }
+            if (Array.isArray(crayons)) {
+                for (const crayon of crayons) {
+                    await knex('scores_crayons')
+                        .where({score_id: scores.scores_id, crayon_id: crayon.crayon_id})
+                        .update({amount: crayon.amount});
+                }
+            }
+            res.status(200).send("Stats updated.");
+        } catch (Err) {
+            console.error(Err);
+            res.status(500).send("Failed to update stats.");
+        }
+    });
+
+    app.get('/leaderboard/top5', async (req, res) => {
+        const sessionId = req.cookies['SessionId'];
+        try {
+            if (!sessionId || !sessions[sessionId]) throw new InvalidSession();
+            const topUsers = await knex('accounts')
+                .join('scores', 'accounts.userId', '=', 'scores.user_id')
+                .select('accounts.username', 'scores.distance')
+                .orderBy('scores.distance', 'desc')
+                .limit(5);
+            res.status(200).json({
+                leaderboard: topUsers
+            });
+        } catch (Err) {
+            switch (true) {
+                case Err.name === 'InvalidSession':
+                    res.status(401).send('Invalid Session');
+                    break;
+                default:
+                    console.error(Err);
+                    res.status(500).send('Internal Server Error');    
+            }
+        }
+    });
 app.listen(port, '0.0.0.0', () => {console.log(`Listening on port ${port}`)})
