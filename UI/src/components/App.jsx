@@ -5,7 +5,9 @@ function App() {
 
   return (
     <Routes>
-      
+      <Route/>
+      <Route/>
+      <Route/>
     </Routes>
   )
 }
