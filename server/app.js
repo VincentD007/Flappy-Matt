@@ -154,14 +154,71 @@ app.post('/accounts', async (req, res) => {
 })
 
 
-app.put('/accounts', (req, res) => {
-    
-})
+app.put('/accounts', async (req, res) => {
+    const sessionId = req.cookies['SessionId'];
+    const {password} = req.body;
+    try {
+        if (!sessionId || !session[sessionId]) throw new InvalidSession();
+        if (!password) throw new InvalidBody();
+
+        const hashed = await bcrypt.hash(password, 12);
+        await knex('accounts')
+            .where({username: sessions[sessionId].username})
+            .update({password: hashed});
+        res.status(200).send("Password updated.")
+    } catch (Err) {
+        res.status(500).send("Update failed.")
+    }  
+});
 
 
-app.get('/accounts/:username', (req, res) => {
+app.get('/accounts/:username', async (req, res) => {
+    const { username } = req.body;
+    try {
+        const user = await knex('accounts')
+            .select('username', 'userId')
+            .where({username})
+            .first();
+        if(!user) throw new NotFound();
+        res.status(200).json(user);
+    } catch (Err1) {
+        res.status(404).send('User not found');
+    }  
+});
 
-})
+app.get('/stats/:username', async (req, res) => {
+    const { username } = req.params;
 
+    try {
+        const user = await knex('accounts').where({ username }).first();
+        if (!user) throw new NotFound();
+        
+        const score = await knex('scores')
+            .where({ user_id: user.userId })
+            .first();
+
+        if (!score) throw new NotFound();
+
+        const crayons = await knex('scores_crayons')
+            .join('crayons', 'scores_crayons.crayon_id', '=', 'crayons.crayon_id')
+            .select('crayons.color', 'scores_crayons.amount')
+            .where({ score_id: score.scores_id });
+
+        res.status(200).json({
+            username: user.username,
+            distance: score.distance,
+            crayons: crayons 
+        });
+    } catch (Err) {
+        switch (true) {
+            case Err.name === 'NotFound':
+                res.status(404).send('User not found');
+                break;
+            default:
+                console.error(Err);
+                res.status(500).send('Internal Server Error');
+        }
+    }
+});
 
 app.listen(port, '0.0.0.0', () => {console.log(`Listening on port ${port}`)})

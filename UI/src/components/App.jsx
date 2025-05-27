@@ -1,14 +1,13 @@
-import { useState } from 'react'
-import {Routes, Route} from 'react-router-dom'
-import Login from './Login.jsx'
+import {Routes, Route} from 'react-router-dom';
+import Login from './Login.jsx';
+import Home from './Home.jsx';
 
 function App() {
 
   return (
     <Routes>
       <Route path='/' element={<Login/>}/>
-      <Route path='/:username/games'/>
-      <Route path='/:username/flappymatt'/>
+      <Route path='/home/:username' element={<Home/>}/>
     </Routes>
   )
 }

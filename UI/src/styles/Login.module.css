@@ -1,9 +1,9 @@
 Body {
     background-color: #242424;
+    
 }
 
 #LoginContainer {
-    color: aqua;
     position: relative;
     display: flex;
     flex-direction: column;

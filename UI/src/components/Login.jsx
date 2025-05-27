@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/Login.css';
 
 export default function Login() {
@@ -6,6 +7,7 @@ export default function Login() {
     const [UserName, setUserName] = useState('');
     const [Password, setPassword] = useState('');
     const notification = useRef('');
+    const navigate = useNavigate();
 
     return (
         <form id='LoginContainer' onSubmit={(event => {event.preventDefault();})}>
@@ -51,6 +53,7 @@ export default function Login() {
                         }, 5000)
                         return;
                     }
+                    navigate(`/home/${UserName}`);
                     
                 }}/>
             <input type='submit' value='Register' className='Button' 
