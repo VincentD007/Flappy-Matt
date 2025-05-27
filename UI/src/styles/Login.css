@@ -1,0 +1,61 @@
+Body {
+    background-color: #242424;
+    color: aqua;
+}
+
+#LoginContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 50px;
+    border: 3px solid black;
+    border-radius: 30px;
+    width: 250px;
+    height: 400px;
+    text-align: center;
+    margin: auto;
+    margin-top: 20vh;
+}
+
+#UserInput {
+    font-size: medium;
+    width: 190px;
+    height: 40px;
+    background-color: #242424;
+    color: aqua;
+    border: 3px solid black;
+    border-radius: 10px;
+}
+
+input {
+    margin-top: 15px;
+}
+
+input:nth-of-type(2) {
+    margin-bottom: 35px;
+}
+
+#UserInput::placeholder {
+    font-size: small;
+}
+
+.Button {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: large;
+    width: 150px;
+    height: 40px;
+    border: 3px solid black;
+    border-radius: 30px;
+}
+
+.Button:hover {
+    background-color: #202020;
+    cursor: pointer;
+}
+
+.Button:active {
+    background-color: #151515;
+}
