@@ -63,7 +63,6 @@ function update() {
     let b2 = this.backgroundloop[1];
     
     if (b2.x === 275) {
-        console.log('shifted');
         this.backgroundloop.push(this.backgroundloop.shift());
         b1.x += b1.width * 2;
     }
