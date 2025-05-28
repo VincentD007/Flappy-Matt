@@ -1,7 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { useRef, useState, useEffect } from "react";
 import '../styles/Home.css';
-import logo from '../images/thunderbolt.png';
+import logo from '../assets/thunderbolt.png';
 import PhaserGame from './PhaserGame.jsx';
 import Scores from './Scores.jsx';
 
