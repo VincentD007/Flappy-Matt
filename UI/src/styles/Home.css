@@ -16,6 +16,16 @@
     margin-top: 50px;
 }
 
+#PhaserRoot {
+    margin: auto;
+    margin-top: 4%;
+}
+
+#PhaserRoot > canvas {
+    border-radius: 20px;
+    border: 3px solid aqua;
+}
+
 .NavContainer {
     display: flex;
     height: 100px;
@@ -38,12 +48,12 @@
 }
 
 .LogoutButton {
-    color: red;
+    color: whitesmoke;
     cursor: pointer;
 }
 
 .LogoutButton:hover {
-    color: #ff4000;
+    color: red;
 }
 
 .Links {

@@ -7,8 +7,8 @@ export default function PhaserGame() {
         const GameConfig = {
             type: AUTO,
             parent: 'PhaserRoot',
-            width: 400,
-            height: 300,
+            width: 550,
+            height: 400,
             scene: {
                 preload: preload,
                 create: create,

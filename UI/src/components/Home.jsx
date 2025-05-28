@@ -16,7 +16,7 @@ export default function Home() {
                 setbodyJSX(
                     <div className="HomeBody">
                         <img className='ThunderBolt' alt='ThunderBolt' src={logo} />
-                        <div onClick={setDisplayed('game')} className="PlayGameButton Button">Play Game</div>
+                        <div onClick={() => {setDisplayed('game')}} className="PlayGameButton Button">Play Game</div>
                         <div className="SettingsButton Button">Settings</div>
                     </div>
                 )
@@ -25,8 +25,7 @@ export default function Home() {
                 setbodyJSX(<Scores/>)
                 break;
             case 'game':
-                // <PhaserGame/>
-                setbodyJSX(<div>gamewefwefewf</div>)
+                setbodyJSX(<PhaserGame/>)
                 break;
     }
     }, [displayed])
