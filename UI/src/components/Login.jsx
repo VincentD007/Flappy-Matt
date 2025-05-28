@@ -11,8 +11,9 @@ export default function Login() {
 
     return (
         <form id='LoginContainer' onSubmit={(event => {event.preventDefault();})}>
-            <h1>Flappy Matt</h1>
+            <h1>GO GO Matt Wegenke</h1>
             <input 
+            maxLength={12}
             onChange={event => {setUserName(event.target.value)}}
             className='UserInput'
             type='text'

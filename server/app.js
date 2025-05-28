@@ -13,7 +13,6 @@ var sessions = {};
 
 app.post('/login', async (req, res) => {
     let {username, password} = req.body;
-    console.log('INNN')
     try {
         if (!username || !password) {
             throw new InvalidBody();
@@ -289,4 +288,6 @@ app.get('/stats/:username', async (req, res) => {
             }
         }
     });
+
+
 app.listen(port, '0.0.0.0', () => {console.log(`Listening on port ${port}`)})
