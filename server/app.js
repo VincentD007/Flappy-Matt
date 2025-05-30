@@ -68,6 +68,7 @@ app.post('/login', async (req, res) => {
 app.post('/logout', (req, res) => {
     const { username } = req.body;
     const clientSession = req.cookies['SessionID'];
+    console.log(clientSession)
     try {
         if (!username) {
             throw new InvalidBody()
@@ -153,141 +154,141 @@ app.post('/accounts', async (req, res) => {
 })
 
 
-app.put('/accounts', async (req, res) => {
-    const sessionId = req.cookies['SessionId'];
-    const {password} = req.body;
-    try {
-        if (!sessionId || !session[sessionId]) throw new InvalidSession();
-        if (!password) throw new InvalidBody();
+// app.put('/accounts', async (req, res) => {
+//     const sessionId = req.cookies['SessionId'];
+//     const {password} = req.body;
+//     try {
+//         if (!sessionId || !session[sessionId]) throw new InvalidSession();
+//         if (!password) throw new InvalidBody();
 
-        const hashed = await bcrypt.hash(password, 12);
-        await knex('accounts')
-            .where({username: sessions[sessionId].username})
-            .update({password: hashed});
-        res.status(200).send("Password updated.")
-    } catch (Err) {
-        res.status(500).send("Update failed.")
-    }  
-});
+//         const hashed = await bcrypt.hash(password, 12);
+//         await knex('accounts')
+//             .where({username: sessions[sessionId].username})
+//             .update({password: hashed});
+//         res.status(200).send("Password updated.")
+//     } catch (Err) {
+//         res.status(500).send("Update failed.")
+//     }  
+// });
 
 
-app.get('/accounts/:username', async (req, res) => {
-    const { username } = req.body;
-    try {
-        const user = await knex('accounts')
-            .select('username', 'userId')
-            .where({username})
-            .first();
-        if(!user) throw new NotFound();
-        res.status(200).json(user);
-    } catch (Err1) {
-        res.status(404).send('User not found');
-    }  
-});
+// app.get('/accounts/:username', async (req, res) => {
+//     const { username } = req.body;
+//     try {
+//         const user = await knex('accounts')
+//             .select('username', 'userId')
+//             .where({username})
+//             .first();
+//         if(!user) throw new NotFound();
+//         res.status(200).json(user);
+//     } catch (Err1) {
+//         res.status(404).send('User not found');
+//     }  
+// });
 
-app.get('/stats/:username', async (req, res) => {
-    const { username } = req.params;
+// app.get('/stats/:username', async (req, res) => {
+//     const { username } = req.params;
 
-    try {
-        const user = await knex('accounts').where({ username }).first();
-        if (!user) throw new NotFound();
+//     try {
+//         const user = await knex('accounts').where({ username }).first();
+//         if (!user) throw new NotFound();
         
-        const score = await knex('scores')
-            .where({ user_id: user.userId })
-            .first();
+//         const score = await knex('scores')
+//             .where({ user_id: user.userId })
+//             .first();
 
-        if (!score) throw new NotFound();
+//         if (!score) throw new NotFound();
 
-        const crayons = await knex('scores_crayons')
-            .join('crayons', 'scores_crayons.crayon_id', '=', 'crayons.crayon_id')
-            .select('crayons.color', 'scores_crayons.amount')
-            .where({ score_id: score.scores_id });
+//         const crayons = await knex('scores_crayons')
+//             .join('crayons', 'scores_crayons.crayon_id', '=', 'crayons.crayon_id')
+//             .select('crayons.color', 'scores_crayons.amount')
+//             .where({ score_id: score.scores_id });
 
-        res.status(200).json({
-            username: user.username,
-            distance: score.distance,
-            crayons: crayons 
-        });
-    } catch (Err) {
-        switch (true) {
-            case Err.name === 'NotFound':
-                res.status(404).send('User not found');
-                break;
-            default:
-                console.error(Err);
-                res.status(500).send('Internal Server Error');
-        }
-    }
-});
-    app.delete('/accounts', async (req, res) => {
-        const sessionId = req.cookies['SessionId'];
-        try {
-            if (!sessionId || !sessions[sessionId]) throw new InvalidSession();
-            const {userId} = sessions[sessionId];
-            await knex('scores_crayons').whereIn('score_id',
-                knex('scores').select('scores_id').where({user_id: userId})
-            ).del();
-           await knex('scores').where({user_id: userId}).del();
-           await knex('accounts').where({userId}).del();
-           delete sessions[sessionId];
-           res.status(200).send("Account deleted."); 
-        } catch (Err){
-            console.error(Err)
-            res.status(500).send("Failed to delete account.");
-        }
-    });
+//         res.status(200).json({
+//             username: user.username,
+//             distance: score.distance,
+//             crayons: crayons 
+//         });
+//     } catch (Err) {
+//         switch (true) {
+//             case Err.name === 'NotFound':
+//                 res.status(404).send('User not found');
+//                 break;
+//             default:
+//                 console.error(Err);
+//                 res.status(500).send('Internal Server Error');
+//         }
+//     }
+// });
+//     app.delete('/accounts', async (req, res) => {
+//         const sessionId = req.cookies['SessionId'];
+//         try {
+//             if (!sessionId || !sessions[sessionId]) throw new InvalidSession();
+//             const {userId} = sessions[sessionId];
+//             await knex('scores_crayons').whereIn('score_id',
+//                 knex('scores').select('scores_id').where({user_id: userId})
+//             ).del();
+//            await knex('scores').where({user_id: userId}).del();
+//            await knex('accounts').where({userId}).del();
+//            delete sessions[sessionId];
+//            res.status(200).send("Account deleted."); 
+//         } catch (Err){
+//             console.error(Err)
+//             res.status(500).send("Failed to delete account.");
+//         }
+//     });
 
-    app.put('/stats', async (req, res) => {
-        const sessionId = req.cookies['SessionId'];
-        const {distance, crayons} = req.body;
+//     app.put('/stats', async (req, res) => {
+//         const sessionId = req.cookies['SessionId'];
+//         const {distance, crayons} = req.body;
 
-        try{
-            if (!sessionId || !sessions[sessionId]) throw new InvalidSession();
-            const user = sessions[sessionId];
-            const score = await knex('scores').where({user_id: user.userId}).first();
-            if (!score) throw new NotFound();
-            if (typeof distance === 'number') {
-                await knex('scores')
-                    .where({user_id: user.userId})
-                    .update({distance})
-            }
-            if (Array.isArray(crayons)) {
-                for (const crayon of crayons) {
-                    await knex('scores_crayons')
-                        .where({score_id: scores.scores_id, crayon_id: crayon.crayon_id})
-                        .update({amount: crayon.amount});
-                }
-            }
-            res.status(200).send("Stats updated.");
-        } catch (Err) {
-            console.error(Err);
-            res.status(500).send("Failed to update stats.");
-        }
-    });
+//         try{
+//             if (!sessionId || !sessions[sessionId]) throw new InvalidSession();
+//             const user = sessions[sessionId];
+//             const score = await knex('scores').where({user_id: user.userId}).first();
+//             if (!score) throw new NotFound();
+//             if (typeof distance === 'number') {
+//                 await knex('scores')
+//                     .where({user_id: user.userId})
+//                     .update({distance})
+//             }
+//             if (Array.isArray(crayons)) {
+//                 for (const crayon of crayons) {
+//                     await knex('scores_crayons')
+//                         .where({score_id: scores.scores_id, crayon_id: crayon.crayon_id})
+//                         .update({amount: crayon.amount});
+//                 }
+//             }
+//             res.status(200).send("Stats updated.");
+//         } catch (Err) {
+//             console.error(Err);
+//             res.status(500).send("Failed to update stats.");
+//         }
+//     });
 
-    app.get('/leaderboard/top5', async (req, res) => {
-        const sessionId = req.cookies['SessionId'];
-        try {
-            if (!sessionId || !sessions[sessionId]) throw new InvalidSession();
-            const topUsers = await knex('accounts')
-                .join('scores', 'accounts.userId', '=', 'scores.user_id')
-                .select('accounts.username', 'scores.distance')
-                .orderBy('scores.distance', 'desc')
-                .limit(5);
-            res.status(200).json({
-                leaderboard: topUsers
-            });
-        } catch (Err) {
-            switch (true) {
-                case Err.name === 'InvalidSession':
-                    res.status(401).send('Invalid Session');
-                    break;
-                default:
-                    console.error(Err);
-                    res.status(500).send('Internal Server Error');    
-            }
-        }
-    });
+//     app.get('/leaderboard/top5', async (req, res) => {
+//         const sessionId = req.cookies['SessionId'];
+//         try {
+//             if (!sessionId || !sessions[sessionId]) throw new InvalidSession();
+//             const topUsers = await knex('accounts')
+//                 .join('scores', 'accounts.userId', '=', 'scores.user_id')
+//                 .select('accounts.username', 'scores.distance')
+//                 .orderBy('scores.distance', 'desc')
+//                 .limit(5);
+//             res.status(200).json({
+//                 leaderboard: topUsers
+//             });
+//         } catch (Err) {
+//             switch (true) {
+//                 case Err.name === 'InvalidSession':
+//                     res.status(401).send('Invalid Session');
+//                     break;
+//                 default:
+//                     console.error(Err);
+//                     res.status(500).send('Internal Server Error');    
+//             }
+//         }
+//     });
 
 
 app.listen(port, '0.0.0.0', () => {console.log(`Listening on port ${port}`)})

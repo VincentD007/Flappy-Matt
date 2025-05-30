@@ -11,6 +11,8 @@ import BarrierThe from '../assets/sprites/obstacle5.png';
 import BarrierAir from '../assets/sprites/obstacle6.png';
 import BarrierForce from '../assets/sprites/obstacle7.png';
 import Helicopter from '../assets/sprites/nighthawk.png';
+import Crayons from '../assets/sprites/Crayons.png';
+import StaminaBar from '../assets/sprites/staminabar.png';
 
 
 export default class PreloadScene extends Phaser.Scene {
@@ -22,8 +24,8 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.image('Background', Background);
         this.load.image('Foreground', Foreground);
         this.load.spritesheet('Player', Player, {
-        frameWidth: 60,
-        frameHeight: 60
+        frameWidth: 58,
+        frameHeight: 50
     });
         this.load.spritesheet('PlayerDeath', PlayerDeath, {
         frameWidth: 160,
@@ -36,6 +38,12 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.image('BarrierThe', BarrierThe);
         this.load.image('BarrierAir', BarrierAir);
         this.load.image('BarrierForce', BarrierForce);
+        this.load.image('Nighthawk', Helicopter);
+        this.load.image('StaminaBar', StaminaBar);
+        this.load.spritesheet('Crayons', Crayons, {
+            frameWidth: 39,
+            frameHeight: 85
+        });
     }
 
     create() {

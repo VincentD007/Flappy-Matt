@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: ./UI
+    image: GoGoMattImage
+    ports:
+      - '5173:5173'
+
+
+  backend:
+    build: ./server
+    image: GoGoMattBackend
+    ports:
+      - '8080:8080'
+    depends_on:
+      - database
+
+  database:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

@@ -15,7 +15,7 @@ export default function PhaserGame() {
             physics: {
                 default: 'arcade',
                 arcade: {
-                    gravity: {y:30},
+                    gravity: {y:150},
                     debug: false
                 }
             }

@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useRef, useState, useEffect } from "react";
 import '../styles/Home.css';
 import logo from '../assets/thunderbolt.png';
@@ -35,11 +35,6 @@ export default function Home() {
         <div className="HomeContainer">
             <NavBar username={username} setDisplayed={setDisplayed} />
             {bodyJSX}
-            {/* <div className="HomeBody">
-                <img className='ThunderBolt' alt='ThunderBolt' src={logo}/>
-                <div onClick={setDisplayed('game')} className="PlayGameButton Button">Play Game</div>
-                <div className="SettingsButton Button">Settings</div>
-            </div> */}
         </div>
     )
 }
@@ -47,7 +42,7 @@ export default function Home() {
 
 function NavBar(props) {
     const { username, setDisplayed } = props;
-
+    const Navigate = useNavigate();
     return (
         <div className="NavContainer">
             <ul className="Links">
@@ -56,7 +51,18 @@ function NavBar(props) {
             </ul>
             <div className="UsernameLogout">
                 <div className="UsernameLabel">{`${username}`}</div>
-                <div className="LogoutButton">Logout</div>
+                <div className="LogoutButton" onClick={() => {
+                     fetch('http://localhost:8080/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({username: username})
+                    })
+                    .then(() => {
+                        Navigate('/')
+                    });
+                }}>Logout</div>
             </div>
         </div>
     )

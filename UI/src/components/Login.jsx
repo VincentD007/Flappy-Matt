@@ -54,9 +54,10 @@ export default function Login() {
                         }, 5000)
                         return;
                     }
+    
                     navigate(`/home/${UserName}`);
-                    
                 }}/>
+
             <input type='submit' value='Register' className='Button' 
                 onClick={async () => {
                     const response = await
