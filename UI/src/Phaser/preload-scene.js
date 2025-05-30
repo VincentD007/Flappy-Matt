@@ -10,6 +10,7 @@ import BarrierJoined from '../assets/sprites/obstacle4.png';
 import BarrierThe from '../assets/sprites/obstacle5.png';
 import BarrierAir from '../assets/sprites/obstacle6.png';
 import BarrierForce from '../assets/sprites/obstacle7.png';
+import Helicopter from '../assets/sprites/nighthawk.png';
 
 
 export default class PreloadScene extends Phaser.Scene {
@@ -20,8 +21,14 @@ export default class PreloadScene extends Phaser.Scene {
     preload() {
         this.load.image('Background', Background);
         this.load.image('Foreground', Foreground);
-        this.load.spritesheet('Player', Player);
-        this.load.spritesheet('PlayerDeath', PlayerDeath);
+        this.load.spritesheet('Player', Player, {
+        frameWidth: 60,
+        frameHeight: 60
+    });
+        this.load.spritesheet('PlayerDeath', PlayerDeath, {
+        frameWidth: 160,
+        frameHeight: 160
+    });
         this.load.image('PlainBarrier', PlainBarrier);
         this.load.image('BarrierShould', BarrierShould);
         this.load.image('BarrierHave', BarrierHave);
@@ -46,7 +53,7 @@ export default class PreloadScene extends Phaser.Scene {
 
         this.anims.create({
             key: 'death',
-            frames: this.anims.generateFrameNumbers('Player', {start: 0, end: 10}),
+            frames: this.anims.generateFrameNumbers('PlayerDeath', {start: 0, end: 9}),
             frameRate: 10,
         })
     }

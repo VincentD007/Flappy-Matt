@@ -13,6 +13,8 @@ export default class GameScene extends Phaser.Scene {
         let f1 = Ground.create(275, 350, 'Foreground').setScale(400/240).refreshBody();
         let f2 = Ground.create(275 + f1.width, 350, 'Foreground').setScale(400/240).refreshBody();
 
+        
+
         this.backgroundloop = [b1, b2];
         this.foregroundloop = [f1, f2];
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -25,18 +27,27 @@ export default class GameScene extends Phaser.Scene {
         this.physics.add.collider(this.PlayerAlive, Ground);
         this.PlayerAlive.setCollideWorldBounds(true);
 
-        this.PlayerDeath = this.physics.sprite.add(100, 150, 'PlayerDeath').setScale(60/160);
+        this.PlayerDeath = this.physics.add.sprite(100, 150, 'PlayerDeath').setScale(60/160);
+        this.physics.add.collider(this.PlayerDeath, Ground);
         this.PlayerAlive.setGravityY(500);
-        // PlayerDeath.setVisible(false);
-
+        this.PlayerDeath.setVisible(false);
+        this.alive = true;
     }
 
     update() {
         if (this.cursors && this.cursors.space.isDown && this.allowJump) {
         this.PlayerAlive.y -= 10;
-        this.PlayerAlive.setVelocityY(-300);
+        this.PlayerAlive.setVelocityY(-250);
         this.allowJump = false;
         setTimeout(() => {this.allowJump = true}, 300)
+    }
+
+    if (this.cursors && this.cursors.down.isDown) {
+        this.PlayerAlive.setVisible(false);
+        this.PlayerDeath.setVisible(true);
+        this.alive = false;
+        this.PlayerDeath.y = this.PlayerAlive.y;
+        this.PlayerDeath.anims.play('death');
     }
 
     if (!(this.PlayerAlive.anims.isPaused) && !(this.PlayerAlive.body.blocked.down)) {
@@ -61,9 +72,11 @@ export default class GameScene extends Phaser.Scene {
         this.foregroundloop.push(this.foregroundloop.shift());
     }
 
-    b1.x -= .25;
-    b2.x -= .25;
-    f1.x -= .5;
-    f2.x -= .5;
+    if (this.alive)    {
+        b1.x -= .25;
+        b2.x -= .25;
+        f1.x -= .5;
+        f2.x -= .5;
     }
+}
 }
